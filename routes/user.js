@@ -104,4 +104,31 @@ router.post('/product', async (req, res) => {
   }
 });
 
+router.post('/get-user', async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).send('Token is required');
+  }
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // Find the user by the decoded user ID
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    // Return the user data
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error verifying token or fetching user:', error);
+    res.status(400).send('Invalid token');
+  }
+});
+
+
 module.exports = router;
