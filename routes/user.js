@@ -114,9 +114,9 @@ router.post('/get-user', async (req, res) => {
   try {
     // Verify the token
     const decoded = jwt.verify(token, JWT_SECRET);
-
+    console.log(decoded);
     // Find the user by the decoded user ID
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded._id);
 
     if (!user) {
       return res.status(404).send('User not found');
