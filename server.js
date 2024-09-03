@@ -11,13 +11,17 @@ const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/user');
 const cartRoutes = require('./routes/cart');
 const ordersRoutes = require('./routes/orders');
+const couponRoutes = require('./routes/coupon');
+const servicesRoutes = require('./routes/services');
 
 // Middleware
 app.use(cors()); // Enable CORS for all routes and origins
 app.use(bodyParser.json()); // Parse incoming JSON requests
 
 // Use routes
+app.use('/service', servicesRoutes);
 app.use('/admin', adminRoutes);
+app.use('/coupon', couponRoutes);
 app.use('/user', userRoutes);
 app.use('/cart', cartRoutes);
 app.use('/orders', ordersRoutes);
@@ -29,7 +33,7 @@ app.use('/orders', ordersRoutes);
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
-mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(DATABASE_URL, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('Failed to connect to MongoDB', err));
 

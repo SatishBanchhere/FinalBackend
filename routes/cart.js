@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const Cart = require('../models/cartModel');
 const Product = require('../models/productModel'); // Ensure this model exists
 const mongoose = require('mongoose');
+const User = require('../models/userModel');
 
 // Middleware to extract userId from token in the body
 const authenticateToken = (req, res, next) => {
@@ -85,11 +86,17 @@ router.post('/remove', authenticateToken, async (req, res) => {
 // Get all cart items with product details
 router.post('/details', authenticateToken, async (req, res) => {
   try {
-    console.log("Details madhe tar aala")
+    console.log("Details endpoint hit");
+
     const userId = req.userId;
     const cart = await Cart.findOne({ userId }).populate('products.productId');
+    const user = await User.findById(userId); // Fetch the user to get the discount
 
     if (!cart) return res.status(404).send('Cart not found');
+    if (!user) return res.status(404).send('User not found');
+
+    // Get the user's discount, default to 0 if not set
+    const discount = user.discount || 0;
 
     // Map cart items to include product details
     const cartItemsWithDetails = await Promise.all(
@@ -99,11 +106,40 @@ router.post('/details', authenticateToken, async (req, res) => {
       })
     );
 
-    res.status(200).send(cartItemsWithDetails);
+    // Send cart items and discount
+    res.status(200).send({ cartItems: cartItemsWithDetails, discount });
   } catch (error) {
-    res.status(400).send(error);
+    console.error(error);
+    res.status(400).send(error.message);
   }
 });
+
+// router.post('/details', authenticateToken, async (req, res) => {
+//   try {
+//     console.log("Details madhe tar aala");
+//     const userId = req.userId;
+//     const cart = await Cart.findOne({ userId }).populate('products.productId');
+//     const user = await User.findById(userId); // Assuming you have a User model
+
+//     if (!cart) return res.status(404).send('Cart not found');
+
+//     // Get the user's discount
+//     const discount = user ? user.discount || 0 : 0;
+
+//     // Map cart items to include product details
+//     const cartItemsWithDetails = await Promise.all(
+//       cart.products.map(async (item) => {
+//         const product = await Product.findById(item.productId);
+//         return { ...item._doc, productDetails: product };
+//       })
+//     );
+
+//     // Send cart items and discount
+//     res.status(200).send({ cartItems: cartItemsWithDetails, discount });
+//   } catch (error) {
+//     res.status(400).send(error);
+//   }
+// });
 
 // Update quantity of a specific product in the cart
 router.post('/update-quantity', authenticateToken, async (req, res) => {
