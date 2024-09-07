@@ -64,6 +64,18 @@ router.put('/suspend', async (req, res) => {
 router.get('/services', authenticateToken, async (req, res) => {
   try {
     const services = await Service.find({ userId: req.userId });
+    console.log(services);
+    res.status(200).json(services);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+});
+
+router.get('/services/all', authenticateToken, async (req, res) => {
+  try {
+    const services = await Service.find(); // Remove the filter for userId
+    console.log(services);
     res.status(200).json(services);
   } catch (error) {
     console.error(error);
