@@ -5,6 +5,10 @@ const serviceSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  userId: {
+    type: String,
+    required: true,
+  },
   brand: {
     type: String,
     required: true,
