@@ -57,7 +57,7 @@ router.put("/toggle-product-approval", async (req, res) => {
     // Verify the token and get the user ID
     const decoded = jwt.verify(token, JWT_SECRET);
     console.log(decoded);
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded._id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

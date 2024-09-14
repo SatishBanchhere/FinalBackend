@@ -96,7 +96,7 @@ const authenticate = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, JWT_SECRET); // Replace 'your_jwt_secret' with your JWT secret
     console.log(decoded);
-    req.userId = decoded.id; // Assuming the token contains a 'userId' field
+    req.userId = decoded._id; // Assuming the token contains a 'userId' field
     next();
   } catch (error) {
     res.status(401).send({ error: 'Invalid token' });

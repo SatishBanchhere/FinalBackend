@@ -12,6 +12,26 @@ const generateReferralCode = () => {
   return Math.random().toString(36).substr(2, 8).toUpperCase(); // Generates a random 8-character code
 };
 
+router.post('/products/category', async (req, res) => {
+  console.log("Atleast aaya toh")
+  const { category } = req.body;
+
+  try {
+    // Find products by category
+    const products = await Product.find({ category });
+    console.log(products)
+    if (products.length === 0) {
+      console.log("Nahi mila kuch")
+      return res.status(404).json({ message: 'No products found in this category' });
+    }
+
+    res.status(200).json(products);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
 router.get('/random-products', async (req, res) => {
   try {
     // Fetch 4 random products that are approved
@@ -107,7 +127,7 @@ const authenticate = (req, res, next) => {
 // Example protected route
 router.get('/profile', authenticate, async (req, res) => {
   try {
-    const userId = req.user.id; // Get user ID from the token
+    const userId = req.user._id; // Get user ID from the token
     console.log(req.user);
     // Find the user by ID
     const user = await User.findById(userId).select('-password'); // Exclude password from the response
@@ -129,7 +149,7 @@ router.get('/profile', authenticate, async (req, res) => {
 // Route to get user profile details
 router.put('/profile', authenticate, async (req, res) => {
   try {
-    const id = req.user.id; // Get user ID from the token
+    const id = req.user._id; // Get user ID from the token
     console.log("waah re baba")
     const { name, gender, email, mobile, address, profileImageUrl } = req.body;
 
@@ -210,11 +230,33 @@ router.patch('/profile', authenticate, async (req, res) => {
   }
 });
 
+router.post('/search', async (req, res) => {
+  console.log("Request toh aayi")
+  const { term } = req.body;
+  console.log(req.body);
+  console.log(term)
+  if (!term) {
+      return res.status(400).json({ error: 'Search term is required' });
+  }
+
+  try {
+      const products = await Product.find({
+          name: { $regex: term, $options: 'i' } // Case-insensitive search
+      }).exec();
+
+      res.json(products);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to fetch products' });
+  }
+});
+
 
 router.post('/product', async (req, res) => {
   console.log("Request received");
 
   const { id } = req.body;
+  console.log(id);
 
   if (!id) {
     console.log("ID not provided");
@@ -249,7 +291,7 @@ router.post('/get-user', async (req, res) => {
     console.log(decoded);
     // Find the user by the decoded user ID
 
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded._id);
     console.log(user);
     if (!user) {
       return res.status(404).send('User not found');

@@ -24,9 +24,26 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
+const authenticateToken1 = (req, res, next) => {
+
+  const { token } = req.body; // Extract token from request body
+  
+  if (!token) return res.status(401).send('Token is required');
+  console.log(token)
+  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+    if (err) {
+      console.log(err);
+      return res.status(403).send('Invalid token');
+    }
+    console.log("Ye hai user");
+    console.log(user);
+    req.userId = user._id; // Assuming token payload contains user ID
+    next();
+  });
+};
 
 // Add a product to the cart
-router.post('/add', authenticateToken, async (req, res) => {
+router.post('/add', authenticateToken1, async (req, res) => {
   try {
     const { productId, quantity } = req.body;
     const userId = req.userId;
@@ -65,7 +82,7 @@ router.post('/add', authenticateToken, async (req, res) => {
 
 
 // Remove all instances of a product from the cart
-router.post('/remove', authenticateToken, async (req, res) => {
+router.post('/remove', authenticateToken1, async (req, res) => {
   try {
     console.log("Thike bhai kata hu remove")
     const { productId } = req.body;
@@ -131,7 +148,7 @@ router.post('/remove', authenticateToken, async (req, res) => {
 // });
 
 
-router.post('/details', authenticateToken, async (req, res) => {
+router.post('/details', authenticateToken1, async (req, res) => {
   try {
     console.log("Details madhe tar aala");
     const userId = req.userId;
