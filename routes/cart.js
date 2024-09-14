@@ -177,7 +177,7 @@ router.post('/details', authenticateToken1, async (req, res) => {
 });
 
 // Update quantity of a specific product in the cart
-router.post('/update-quantity', authenticateToken, async (req, res) => {
+router.post('/update-quantity', authenticateToken1, async (req, res) => {
   try {
     const { productId, quantity } = req.body;
     const userId = req.userId;

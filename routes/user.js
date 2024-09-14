@@ -17,12 +17,15 @@ router.post('/products/category', async (req, res) => {
   const { category } = req.body;
 
   try {
-    // Find products by category
-    const products = await Product.find({ category });
+    // Find approved products by category
+    const products = await Product.find({ 
+      category, 
+      isApproved: true 
+    });
     console.log(products)
     if (products.length === 0) {
       console.log("Nahi mila kuch")
-      return res.status(404).json({ message: 'No products found in this category' });
+      return res.status(404).json({ message: 'No approved products found in this category' });
     }
 
     res.status(200).json(products);
@@ -31,6 +34,7 @@ router.post('/products/category', async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 });
+
 
 router.get('/random-products', async (req, res) => {
   try {
